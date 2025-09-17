@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 from src.utils.db import get_db
 from src.models.carts import Cart, CartItem
 from src.models.products import Product
@@ -85,17 +85,19 @@ def add_item(user_id: int, item: CartItemCreate, db: Session = Depends(get_db)):
     )
 
     if cart_item:
-        # Nếu đã có thì cộng dồn số lượng
+        # Nếu đã có thì cộng dồn số lượngutcnow
         cart_item.quantity += item.quantity
+        cart.updated_at = datetime.now(timezone.utc)
     else:
         # Nếu chưa có thì thêm mới
         cart_item = CartItem(
             cart_id=cart.cart_id,
             product_id=item.product_id,
             quantity=item.quantity,
+            updated_at = datetime.now(timezone.utc)
         )
         db.add(cart_item)
-    cart.updated_at = datetime.utcnow()
+    cart.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)
@@ -117,9 +119,9 @@ def update_item(user_id: int, item_id: int, item: CartItemCreate, db: Session = 
         raise HTTPException(status_code=404, detail="Item not found")
 
     cart_item.quantity = item.quantity
-    cart_item.updated_at = datetime.utcnow()
+    cart_item.updated_at = datetime.now(timezone.utc)
 
-    cart.updated_at = datetime.utcnow()
+    cart.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)
@@ -141,7 +143,7 @@ def delete_item(user_id: int, item_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Item not found")
 
     db.delete(cart_item)
-    cart.updated_at = datetime.utcnow()
+    cart.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)
@@ -155,7 +157,7 @@ def clear_cart(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Cart not found")
 
     db.query(CartItem).filter(CartItem.cart_id == cart.cart_id).delete()
-    cart.updated_at = datetime.utcnow()
+    cart.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)

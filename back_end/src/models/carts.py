@@ -10,7 +10,6 @@ class Cart(Base):
 
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), server_onupdate=func.now(), nullable=False)
-    # Quan hệ 1-n: 1 cart có nhiều cart_items
     items = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
     
 
@@ -27,4 +26,4 @@ class CartItem(Base):
     
     # Quan hệ ngược
     cart = relationship("Cart", back_populates="items")
-    product = relationship("Product")  # để join lấy thông tin sản phẩm
+    product = relationship("Product")  
