@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime
 from src.utils.db import get_db
 from src.models.carts import Cart, CartItem
 from src.models.products import Product
@@ -28,6 +29,8 @@ def build_cart_response(cart: Cart, db: Session):
                 "image_url": p.image_url,
                 "stock": p.stock,
                 "sold": p.sold,
+                "created_at": ci.created_at,
+                "updated_at": ci.updated_at,
             }
             for ci, p in items
         ]
@@ -36,6 +39,8 @@ def build_cart_response(cart: Cart, db: Session):
             "user_id": cart.user_id,
             "cart_id": cart.cart_id,
             "items": cart_items,
+            "created_at": cart.created_at,
+            "updated_at": cart.updated_at,
         }
     except Exception as e:
         import traceback
@@ -90,7 +95,7 @@ def add_item(user_id: int, item: CartItemCreate, db: Session = Depends(get_db)):
             quantity=item.quantity,
         )
         db.add(cart_item)
-
+    cart.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)
@@ -112,6 +117,9 @@ def update_item(user_id: int, item_id: int, item: CartItemCreate, db: Session = 
         raise HTTPException(status_code=404, detail="Item not found")
 
     cart_item.quantity = item.quantity
+    cart_item.updated_at = datetime.utcnow()
+
+    cart.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)
@@ -133,6 +141,7 @@ def delete_item(user_id: int, item_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Item not found")
 
     db.delete(cart_item)
+    cart.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)
@@ -146,6 +155,7 @@ def clear_cart(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Cart not found")
 
     db.query(CartItem).filter(CartItem.cart_id == cart.cart_id).delete()
+    cart.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)

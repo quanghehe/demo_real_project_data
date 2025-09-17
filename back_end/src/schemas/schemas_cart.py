@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+from datetime import datetime
 
 
 # CartItem Schema
@@ -18,6 +19,8 @@ class CartItemResponse(CartItemBase):
     name: str
     price: float
     image_url: Optional[str] = None  # có thể null nếu sp không có ảnh
+    created_at: Optional[datetime] = None 
+    updated_at: Optional[datetime] = None 
 
     class Config:
         orm_mode = True
@@ -36,6 +39,8 @@ class CartCreate(CartBase):
 class CartResponse(CartBase):
     cart_id: int
     items: List[CartItemResponse] = []
+    created_at: Optional[datetime] = None 
+    updated_at: Optional[datetime] = None 
 
     class Config:
         orm_mode = True
