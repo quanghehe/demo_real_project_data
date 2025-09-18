@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 class OrderItemBase(BaseModel):
@@ -13,6 +13,7 @@ class OrderItemCreate(OrderItemBase):
 
 class OrderItemResponse(OrderItemBase):
     order_item_id: int
+    updated_at: Optional[datetime]
     class Config:
         orm_mode = True
 

@@ -12,7 +12,7 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db)):
     new_order = Order(
         user_id=order.user_id,
         total_amount=order.total_amount,
-        status="pending"
+        status="paid"
     )
     db.add(new_order)
     db.commit()
