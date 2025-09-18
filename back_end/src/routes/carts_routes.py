@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime, timedelta, timezone
+
+
 from sqlalchemy.orm import Session
-from datetime import datetime, timezone
 from src.utils.db import get_db
 from src.models.carts import Cart, CartItem
 from src.models.products import Product
 from src.schemas.schemas_cart import CartResponse, CartItemCreate
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
+VN_TZ = timezone(timedelta(hours=7))
 
 
 # 🔹 Hàm tiện ích: format cart + join Product
@@ -63,7 +66,7 @@ def get_cart(user_id: int, db: Session = Depends(get_db)):
     return build_cart_response(cart, db)
 
 
-# 🟢 Add product to cart (sửa lại để không bị trùng)
+# 🟢 Add product to cart (không bị trùng)
 @router.post("/{user_id}/items", response_model=CartResponse)
 def add_item(user_id: int, item: CartItemCreate, db: Session = Depends(get_db)):
     cart = db.query(Cart).filter(Cart.user_id == user_id).first()
@@ -77,7 +80,6 @@ def add_item(user_id: int, item: CartItemCreate, db: Session = Depends(get_db)):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # ✅ Kiểm tra sản phẩm đã tồn tại trong giỏ chưa
     cart_item = (
         db.query(CartItem)
         .filter(CartItem.cart_id == cart.cart_id, CartItem.product_id == item.product_id)
@@ -85,19 +87,16 @@ def add_item(user_id: int, item: CartItemCreate, db: Session = Depends(get_db)):
     )
 
     if cart_item:
-        # Nếu đã có thì cộng dồn số lượngutcnow
         cart_item.quantity += item.quantity
-        cart.updated_at = datetime.now(timezone.utc)
     else:
-        # Nếu chưa có thì thêm mới
         cart_item = CartItem(
             cart_id=cart.cart_id,
             product_id=item.product_id,
             quantity=item.quantity,
-            updated_at = datetime.now(timezone.utc)
         )
         db.add(cart_item)
-    cart.updated_at = datetime.now(timezone.utc)
+    cart.updated_at = datetime.now(VN_TZ)
+    
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)
@@ -119,9 +118,6 @@ def update_item(user_id: int, item_id: int, item: CartItemCreate, db: Session = 
         raise HTTPException(status_code=404, detail="Item not found")
 
     cart_item.quantity = item.quantity
-    cart_item.updated_at = datetime.now(timezone.utc)
-
-    cart.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)
@@ -143,7 +139,6 @@ def delete_item(user_id: int, item_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Item not found")
 
     db.delete(cart_item)
-    cart.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)
@@ -157,7 +152,6 @@ def clear_cart(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Cart not found")
 
     db.query(CartItem).filter(CartItem.cart_id == cart.cart_id).delete()
-    cart.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(cart)
     return build_cart_response(cart, db)

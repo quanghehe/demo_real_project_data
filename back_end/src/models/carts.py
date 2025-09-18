@@ -9,7 +9,7 @@ class Cart(Base):
     user_id = Column(Integer, ForeignKey("users.user_id"), unique=True, nullable=False)
 
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime, server_default=func.now(), server_onupdate=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), nullable=False)
     items = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
     
 
