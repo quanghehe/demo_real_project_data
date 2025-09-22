@@ -1,0 +1,45 @@
+version: '3'
+services:
+  spark-master:
+    image: bde2020/spark-master:latest
+    container_name: spark-master
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    networks:
+      - spark-net
+    volumes:
+      - ./data_pipeline:/app/data_pipeline
+      - ./data:/app/data
+
+  spark-worker-1:
+    image: bde2020/spark-worker:latest
+    container_name: spark-worker-1
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    networks:
+      - spark-net
+    volumes:
+      - ./data_pipeline:/app/data_pipeline
+      - ./data:/app/data
+
+  spark-worker-2:
+    image: bde2020/spark-worker:latest
+    container_name: spark-worker-2
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    networks:
+      - spark-net
+    volumes:
+      - ./data_pipeline:/app/data_pipeline
+      - ./data:/app/data
+
+
+networks:
+  spark-net:
