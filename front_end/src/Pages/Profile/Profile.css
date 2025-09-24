@@ -1,0 +1,124 @@
+/* Container chính */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f0f2f5, #e0e7ff);
+  text-align: center;
+  font-family: 'Poppins', Arial, sans-serif;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Tiêu đề */
+.profile-container h2 {
+  font-size: 3rem;
+  color: #1a1a1a;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+/* Hiệu ứng underline dưới tên */
+.profile-container h2::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: #6c63ff;
+  margin: 10px auto 0;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.profile-container h2:hover::after {
+  width: 100px;
+}
+
+/* Các thông tin */
+.profile-container p {
+  font-size: 1.1rem;
+  color: #444;
+  margin: 8px 0;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.profile-container p:hover {
+  transform: translateX(5px);
+  color: #6c63ff;
+}
+
+/* Nút đăng xuất */
+.logout-btn {
+  padding: 14px 30px;
+  margin-top: 20px;
+  background: linear-gradient(135deg, #ff4d4f, #ff7b72);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(255, 77, 79, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover nút */
+.logout-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(255, 77, 79, 0.5);
+  background: linear-gradient(135deg, #e63946, #ff4d4f);
+}
+
+/* Animation fadeIn */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(-20px);}
+  100% { opacity: 1; transform: translateY(0);}
+}
+
+/* Loading text */
+.profile-container p.loading {
+  font-size: 1.2rem;
+  color: #888;
+  animation: pulse 1.5s infinite;
+}
+
+/* Hiệu ứng pulse cho loading */
+@keyframes pulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+.profile-card {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 15px 20px;
+  margin: 10px 0;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.profile-icon {
+  font-size: 1.5rem;
+  color: #6c63ff;
+  margin-right: 15px;
+}
+
+.profile-info p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
