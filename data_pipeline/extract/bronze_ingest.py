@@ -12,7 +12,7 @@ jdbc_props = {
     "driver": "com.mysql.cj.jdbc.Driver"
 }
 
-tables = ["users", "orders", "order_items"]
+tables = ["users", "orders", "order_items","products"]
 
 for table in tables:
     print(f"=== Extracting {table} ===")
